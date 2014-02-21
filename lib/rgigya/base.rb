@@ -41,8 +41,22 @@ module RGigya
   # Custom Exceptions so we know it came from the library
   # When in use please namespace them appropriately RGigya::ResponseError for readability
   #
-  exceptions = %w[ UIDParamIsNil SiteUIDParamIsNil ResponseError BadParamsOrMethodName ErrorCodeReturned MissingApiKey MissingApiSecret]
+  exceptions = %w[ UIDParamIsNil SiteUIDParamIsNil ResponseError BadParamsOrMethodName MissingApiKey MissingApiSecret]
   exceptions.each { |e| const_set(e, Class.new(StandardError)) }
+
+  class ErrorCodeReturned < StandardError
+    @error_code = nil
+
+    def initialize(msg, error_code = nil)
+      super(msg)
+      @error_code = error_code
+    end
+
+    def code
+      @error_code
+    end
+  end
+
   RGigya::JSONParseError = Class.new(JSON::ParserError)
 
   class << self
@@ -136,7 +150,7 @@ module RGigya
       return false if response.nil? || response.body == "Bad Request"
 
       begin
-        doc = JSON(response.body)
+        doc = JSON.parse(response.body)
       rescue JSON::ParserError => e
         raise RGigya::JSONParseError, e.message
       end
@@ -226,7 +240,7 @@ module RGigya
 
 
       begin
-        doc = JSON(response.body)
+        doc = JSON.parse(response.body)
       rescue JSON::ParserError => e
         raise RGigya::JSONParseError, e.message
       end
@@ -274,10 +288,10 @@ module RGigya
           log("Gigya base_signature_string = #{results['baseString']}\n\n\n")
           log("Rgigya signature = #{@@signature}\n\n")
           log("Gigya signature = #{results['expectedSignature']}\n\n")
-          raise RGigya::ErrorCodeReturned, "returned Error code #{results['errorCode']}: #{results['errorMessage']}"
+          raise RGigya::ErrorCodeReturned.new(results['errorMessage'], results['errorCode'])
         else
           log("RGigya returned Error code #{results['errorCode']}.\n\nError Message: #{results['errorMessage']}\n\nError Details: #{results['errorDetails']}")
-          raise RGigya::ErrorCodeReturned, "returned Error code #{results['errorCode']}: #{results['errorMessage']}"
+          raise RGigya::ErrorCodeReturned.new(results['errorMessage'], results['errorCode'])
       end
     end
 
