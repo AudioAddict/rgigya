@@ -73,6 +73,7 @@ module RGigya
       @@api_secret = config_data[:api_secret]
       @@use_ssl = config_data[:use_ssl] || false
       @@domain = config_data[:domain] || "us1"
+      @@timeout = config_data[:timeout] || 10
 
       verify_config_data
     end
@@ -143,7 +144,10 @@ module RGigya
     def parse_results_secure(method,options)
       # options = {} if options.is_a?(String) && options.blank?
       begin
-        response = HTTParty.get(build_url(method, "GET", options),{:timeout => 10})
+        response = HTTParty.get(
+          build_url(method, "GET", options),
+          {:timeout => @@timeout}
+        )
       rescue SocketError,Timeout::Error => e
         raise RGigya::ResponseError, e.message
       end
@@ -230,7 +234,13 @@ module RGigya
     def parse_results_with_signature(method, options)
       request_uri = build_url(method, "POST", options)
       begin
-        response = HTTParty.post(request_uri, { :body => params_with_signature(request_uri,options) })
+        response = HTTParty.post(
+          request_uri,
+          { 
+            :body => params_with_signature(request_uri,options),
+            :timeout => @@timeout
+          }
+        )
       rescue URI::InvalidURIError
         # need to treat this like method missing
         return false
