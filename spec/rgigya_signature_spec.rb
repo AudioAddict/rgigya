@@ -7,7 +7,8 @@ describe "RGigyaSignature" do
       :api_key => GIGYA_API_KEY,
       :api_secret => GIGYA_API_SECRET,
       :use_ssl => false,
-      :domain => "us1"
+      :domain => "us1",
+      :timeout => 2
     })
     @protocol = "http"
     @method = "POST"
@@ -16,6 +17,17 @@ describe "RGigyaSignature" do
   
   it_behaves_like RGigya
   
+  it "should pass the timeout config value to HTTParty" do
+    HTTParty.should_receive(:post) do |url, options|
+      options[:timeout].should == 2
+      OpenStruct.new({
+        body: JSON({errorCode: '0'})
+      })
+    end
+
+    RGigya.socialize_getUserInfo({UID: "1", includeAllIdentities: true})
+  end    
+
   it "should verify signature after successful login" do
     userInfo = {
       'nickname' => 'Gigems', 
