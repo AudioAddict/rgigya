@@ -140,36 +140,36 @@ shared_examples_for RGigya do
     end
     
     it "should not respond to method starting without socialize,gm, accounts,reports, chat,ds or comments" do
-      RGigya.respond_to?(:abc,false).should be_false
+      RGigya.respond_to?(:abc,false).should be false
     end
     
     it "should respond to method starting with socialize" do
-      RGigya.respond_to?(:socialize_getUserInfo,false).should be_true
+      RGigya.respond_to?(:socialize_getUserInfo,false).should be true
     end
     
     
     it "should respond to method starting with gm" do
-      RGigya.respond_to?(:gm_notifyAction,false).should be_true
+      RGigya.respond_to?(:gm_notifyAction,false).should be true
     end
     
     it "should respond_to method starting with comments" do
-      RGigya.respond_to?(:comments_getComments,false).should be_true
+      RGigya.respond_to?(:comments_getComments,false).should be true
     end
     
     it "should respond_to method starting with accounts" do
-      RGigya.respond_to?(:accounts_getPolicies,false).should be_true
+      RGigya.respond_to?(:accounts_getPolicies,false).should be true
     end
     
     it "should respond_to method starting with reports" do
-      RGigya.respond_to?(:reports_getChatStats,false).should be_true
+      RGigya.respond_to?(:reports_getChatStats,false).should be true
     end
     
     it "should respond_to method starting with chat" do
-      RGigya.respond_to?(:chat_getMessages,false).should be_true
+      RGigya.respond_to?(:chat_getMessages,false).should be true
     end
     
     it "should respond_to method starting with ds" do
-      RGigya.respond_to?(:ds_get,false).should be_true
+      RGigya.respond_to?(:ds_get,false).should be true
     end
     
     
@@ -198,9 +198,9 @@ shared_examples_for RGigya do
     
     it "should log to the Rails log if rails exists" do
       # Mock and Stub Rails.logger.info
-      Rails = mock("Rails")
+      Rails = double("Rails")
       Rails.stub(:logger) {  
-        logger = mock("Logger");
+        logger = double("Logger");
         logger.stub(:info) do |str|
           puts "mocked_data=#{str}"
         end
@@ -224,28 +224,28 @@ shared_examples_for RGigya do
         nil
       end
       
-      RGigya.parse_results("socialize_notAMethod",{}).should be_false
+      RGigya.parse_results("socialize_notAMethod",{}).should be false
     end
       
     it "should raise json error if gigya returns bad json" do
       HTTParty.stub(:get) do |url,options|
-        Response = mock("Response")
-        Response.stub(:body) {
+        response = double("Response")
+        response.stub(:body) {
           '{'
         }
-        Response
+        response
       end
       HTTParty.stub(:post) do |url,options|
-        Response = mock("Response")
-        Response.stub(:body) {
+        response = double("Response")
+        response.stub(:body) {
           '{'
         }
-        Response
+        response
       end
       
       
       expect {
-        RGigya.parse_results("socialize_notAMethod",{}).should be_false
+        RGigya.parse_results("socialize_notAMethod",{}).should be false
       }.to raise_error(RGigya::JSONParseError)
     end
       
@@ -259,7 +259,7 @@ shared_examples_for RGigya do
       end
       
       expect {
-        RGigya.parse_results("socialize_notAMethod",{}).should be_false
+        RGigya.parse_results("socialize_notAMethod",{}).should be false
       }.to raise_error(RGigya::ResponseError)    
     end
     
@@ -272,7 +272,7 @@ shared_examples_for RGigya do
       end
       
       expect {
-        RGigya.parse_results("socialize_notAMethod",{}).should be_false
+        RGigya.parse_results("socialize_notAMethod",{}).should be false
       }.to raise_error(RGigya::ResponseError)
       
     end

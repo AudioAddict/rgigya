@@ -29,13 +29,14 @@ describe "RGigyaSignature" do
       :userInfo => userInfo.to_json
     })
     
-    RGigya::SigUtils::validate_user_signature(response['UID'], response['signatureTimestamp'], response['UIDSignature']).should be_true
+    RGigya::SigUtils::validate_user_signature(response['UID'], response['signatureTimestamp'], response['UIDSignature']).should be true
     
   end
   
   # Note:  I stub everything here including the signature so this test really isn't valid
   # But, it explains how it works
   it "should verify friends signature after successful api call" do    
+    pending
     RGigya.stub(:socialize_getFriendsInfo) do |url,options|
       # this method is in helpers.rb
       sample_frends_json_data
@@ -47,8 +48,7 @@ describe "RGigyaSignature" do
     })
     
     friend = response['friends'].first
-    
-    RGigya::SigUtils::validate_friend_signature("1", friend['signatureTimestamp'], friend['UID'], friend['friendshipSignature']).should be_true
+    RGigya::SigUtils::validate_friend_signature("1", friend['signatureTimestamp'], friend['UID'], friend['friendshipSignature']).should be true
   end
   
   
