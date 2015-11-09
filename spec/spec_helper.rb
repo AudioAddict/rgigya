@@ -1,5 +1,6 @@
 require 'rgigya' # and any other gems you need
 require 'helpers.rb'
+require 'pry-byebug'
 RSpec.configure do |config|
   # some (optional) config here
   config.include Helpers
